@@ -1,26 +1,29 @@
 import os
 import sys
-import subprocess
-import threading
+import streamlit.web.bootstrap
 
-# Fonction pour exécuter Streamlit dans un thread séparé
+# Set the streamlit configuration to use the correct port
+os.environ["STREAMLIT_SERVER_PORT"] = "8000"
+os.environ["STREAMLIT_SERVER_ADDRESS"] = "0.0.0.0"
+os.environ["STREAMLIT_SERVER_ENABLE_CORS"] = "false"
+os.environ["STREAMLIT_SERVER_HEADLESS"] = "true"
+
+# Function to run streamlit
 def run_streamlit():
-    sys.argv = ["streamlit", "run", "app.py", "--server.port=8000", "--server.address=0.0.0.0"]
-    import streamlit.web.bootstrap
+    sys.argv = ["streamlit", "run", "app.py", 
+                "--server.port=8000", 
+                "--server.address=0.0.0.0",
+                "--server.enableCORS=false",
+                "--server.enableXsrfProtection=false",
+                "--server.headless=true"]
     streamlit.web.bootstrap.run()
 
-# Variable pour stocker le thread Streamlit
-streamlit_thread = None
-
-def on_starting(server):
-    """Fonction appelée au démarrage de Gunicorn"""
-    global streamlit_thread
-    streamlit_thread = threading.Thread(target=run_streamlit)
-    streamlit_thread.daemon = True
-    streamlit_thread.start()
-
-# Simple application WSGI qui redirige vers Streamlit
-def application(environ, start_response):
-    # Rediriger toutes les requêtes vers le port Streamlit
-    start_response('200 OK', [('Content-type', 'text/plain')])
+# Entry point for gunicorn
+def app(environ, start_response):
+    # This is just a placeholder as we'll run Streamlit directly
+    start_response('200 OK', [('Content-Type', 'text/plain')])
     return [b'Streamlit is running']
+
+# Run Streamlit when this module is imported
+if __name__ == "__main__":
+    run_streamlit()

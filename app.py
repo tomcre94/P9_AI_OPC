@@ -409,10 +409,6 @@ st.sidebar.info("""
 © 2025 - Tous droits réservés
 """)
 
-# Configuration pour Gunicorn
-server = st.server.server.Server()
-app = server.app
-
 # Pour exécuter avec streamlit en local
 if __name__ == "__main__":
     st.cli.main()
