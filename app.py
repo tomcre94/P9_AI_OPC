@@ -149,7 +149,7 @@ def create_sample_data():
     return df
 
 # Fonction pour charger le modèle et le tokenizer
-@st.cache_resource
+@st.cache_resource(ttl=3600)  # Cache le modèle pour 1 heure
 def load_model_and_tokenizer(model_path=None, tokenizer_name="roberta-base", device=None):
     """Charge le modèle TRABSA et le tokenizer"""
     import os
