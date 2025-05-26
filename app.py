@@ -3,23 +3,53 @@ import streamlit as st
 import pandas as pd
 import torch
 import os
-os.environ['CURL_CA_BUNDLE'] = ''
 import sys
+import logging
+
+# Configuration de la journalisation
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger('trabsa-dashboard')
+
+# Diagnostics d'environnement
+logger.info(f"Python version: {sys.version}")
+logger.info(f"Working directory: {os.getcwd()}")
+logger.info(f"Python path: {sys.path}")
+logger.info(f"Directory contents: {os.listdir('.')}")
+try:
+    logger.info(f"Utils directory contents: {os.listdir('utils')}")
+except FileNotFoundError:
+    logger.error("Utils directory not found!")
+
+os.environ['CURL_CA_BUNDLE'] = ''
 # Ajout du répertoire courant au chemin Python pour les importations
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, BASE_DIR)
+logger.info(f"Added {BASE_DIR} to sys.path")
 
 # Importation des modules
-from utils.preprocessing import clean_text
-import plotly.graph_objects as go
-from utils.visualization import (
-    create_text_length_histogram, 
-    create_word_count_histogram, 
-    create_sentiment_distribution, 
-    create_word_frequency_chart,
-    create_wordcloud
-)
-from utils.model_utils import load_model_and_tokenizer, predict_sentiment
+try:
+    from utils.preprocessing import clean_text
+    import plotly.graph_objects as go
+    from utils.visualization import (
+        create_text_length_histogram, 
+        create_word_count_histogram, 
+        create_sentiment_distribution, 
+        create_word_frequency_chart,
+        create_wordcloud
+    )
+    from utils.model_utils import load_model_and_tokenizer, predict_sentiment
+    logger.info("All modules imported successfully")
+except Exception as e:
+    logger.error(f"Error importing modules: {e}", exc_info=True)
+    # Pour le débogage, essayer d'importer individuellement
+    try:
+        import utils
+        logger.info("utils package imported")
+    except ImportError as e:
+        logger.error(f"Failed to import utils package: {e}")
 
 # Configuration de la page Streamlit
 st.set_page_config(
