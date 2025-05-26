@@ -22,20 +22,14 @@ jobs:
           pip install -r requirements.txt
           python -m nltk.downloader punkt stopwords wordnet
 
-      - name: Prepare deployment
+      - name: Create startup file
         run: |
-          # Créer des fichiers __init__.py dans tous les dossiers pour assurer qu'ils sont traités comme des packages Python
-          find . -type d -not -path "*/\.*" -not -path "*/venv*" -exec touch {}/__init__.py \;
-
-          # Vérifier la structure
-          find . -type f -name "*.py" | sort
-
-          # S'assurer que startup.sh est exécutable
-          chmod +x startup.sh
+          # Créer un fichier startup.txt qui sera utilisé par Azure App Service
+          echo "gunicorn --bind=0.0.0.0 --timeout 600 --workers 2 --threads 2 app:app" > startup.txt
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'trabsa-dashboard'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          startup-command: './startup.sh'
+          package: .
