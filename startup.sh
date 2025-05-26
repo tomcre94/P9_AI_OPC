@@ -1,7 +1,7 @@
 #!/bin/bash
-# filepath: c:\Users\creus\OneDrive\Bureau\IA\7e projet\trabsa-dashboard\startup.sh
 
 echo "Démarrage de l'application Streamlit sur Azure App Service"
+cd /home/site/wwwroot
 
 # Configurer le PYTHONPATH pour inclure le répertoire du projet
 export PYTHONPATH="/home/site/wwwroot:$PYTHONPATH"
@@ -17,6 +17,10 @@ echo "Contenu du répertoire utils (si existe):"
 
 # Définir le port pour correspondre à ce qu'Azure attend
 export PORT=8000
+# Vérifier les variables Streamlit
+export STREAMLIT_SERVER_PORT=8000
+export STREAMLIT_SERVER_ADDRESS=0.0.0.0
+export PYTHONPATH=/home/site/wwwroot:$PYTHONPATH
 
-# Démarrer Streamlit sur le port attendu par Azure
-streamlit run --server.port=$PORT --server.address=0.0.0.0 app.py
+# Démarrer Gunicorn avec la configuration adaptée à Streamlit
+gunicorn --bind=0.0.0.0:8000 --timeout=600 --workers=1 --threads=8 wsgi:application
