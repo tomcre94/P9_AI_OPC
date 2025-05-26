@@ -17,5 +17,5 @@ export STREAMLIT_SERVER_PORT=8000
 export STREAMLIT_SERVER_ADDRESS=0.0.0.0
 export PYTHONPATH=/home/site/wwwroot:$PYTHONPATH
 
-# Run Streamlit directly with the appropriate port and address
-streamlit run app.py --server.port=8000 --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false
+# Démarrer l'application avec Gunicorn
+gunicorn --bind=0.0.0.0:$PORT --timeout=600 --workers=1 --threads=8 wsgi:app
