@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import torch
 import os
+import sys
 # Ajout du répertoire courant au chemin Python pour les importations
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, BASE_DIR)
