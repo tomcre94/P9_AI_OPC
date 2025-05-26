@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import torch
 import os
+os.environ['CURL_CA_BUNDLE'] = ''
 import sys
 # Ajout du répertoire courant au chemin Python pour les importations
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -10,6 +11,7 @@ sys.path.insert(0, BASE_DIR)
 
 # Importation des modules
 from utils.preprocessing import clean_text
+import plotly.graph_objects as go
 from utils.visualization import (
     create_text_length_histogram, 
     create_word_count_histogram, 
@@ -263,7 +265,7 @@ elif page == "Prédiction de Sentiment":
     """)
     
     # Chargement du modèle
-    model, tokenizer = load_trabsa_model()
+    model, tokenizer = load_model_and_tokenizer()
     
     if model is not None and tokenizer is not None:
         # Zone de saisie de texte
