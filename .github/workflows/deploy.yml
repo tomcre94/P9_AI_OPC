@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          cache: 'pip' # Optimisation: mise en cache des dépendances pip
 
       - name: Install dependencies
         run: |
@@ -27,11 +28,28 @@ jobs:
           # Créer des fichiers __init__.py dans tous les dossiers pour les packages Python
           find . -type d -not -path "*/\.*" -not -path "*/venv*" -exec touch {}/__init__.py \;
 
-          # S'assurer que le script de démarrage est exécutable
-          chmod +x startup.sh
+          # Vérifier que startup.txt existe et a le bon contenu
+          if [ ! -f "startup.txt" ]; then
+            echo "gunicorn --bind=0.0.0.0 --timeout 600 --workers 2 --threads 2 wsgi:app" > startup.txt
+          fi
+
+          # Vérifier la présence de wsgi.py
+          if [ ! -f "wsgi.py" ]; then
+            echo "ERREUR: fichier wsgi.py manquant!"
+            exit 1
+          fi
+
+      - name: Validate deployment configuration
+        run: |
+          echo "Configuration de déploiement:"
+          echo "- Python: $(python --version)"
+          echo "- Contenu de startup.txt: $(cat startup.txt)"
+          echo "- Structure de fichiers:"
+          find . -type f -name "*.py" | sort
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'trabsa-dashboard'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          startup-command: '' # Champ vide pour s'assurer que startup.txt est utilisé
