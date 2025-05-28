@@ -17,9 +17,12 @@ export STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
 # Afficher des informations de diagnostic
 echo "Environment:"
 echo "Python version: $(python --version)"
+echo "Python3 version: $(python3 --version)" # Add this
+echo "Which python: $(which python)" # Add this
+echo "Which python3: $(which python3)" # Add this
 echo "Current directory: $(pwd)"
 echo "PYTHONPATH: $PYTHONPATH"
 echo "APP_PORT: $APP_PORT" # Use APP_PORT for diagnostics
 
 # Exécuter Streamlit directement
-python3 -m streamlit run app.py --server.port=$APP_PORT --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.headless=true
+python -m streamlit run app.py --server.port=$APP_PORT --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.headless=true
