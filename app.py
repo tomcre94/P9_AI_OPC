@@ -4,6 +4,8 @@ import torch
 import os
 import sys
 import logging
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from model.trabsa_model import TRABSA_PyTorch
 
 # Configuration de la journalisation
 logging.basicConfig(
@@ -408,7 +410,3 @@ st.sidebar.info("""
 **TRABSA Dashboard** v1.0
 © 2025 - Tous droits réservés
 """)
-
-# Pour exécuter avec streamlit en local
-if __name__ == "__main__":
-    st.cli.main()
