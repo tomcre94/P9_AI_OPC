@@ -22,4 +22,4 @@ echo "PYTHONPATH: $PYTHONPATH"
 echo "APP_PORT: $APP_PORT" # Use APP_PORT for diagnostics
 
 # Exécuter Streamlit directement
-streamlit run app.py --server.port=$APP_PORT --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.headless=true
+python3 -m streamlit run app.py --server.port=$APP_PORT --server.address=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false --server.headless=true
