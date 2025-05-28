@@ -155,7 +155,8 @@ def load_model_and_tokenizer(model_path=None, tokenizer_name="roberta-base", dev
     import os
     from azure.storage.blob import BlobClient
     import tempfile
-    
+    from azure.identity import DefaultAzureCredential
+    credential = DefaultAzureCredential()
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
