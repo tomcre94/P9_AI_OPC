@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import torch
@@ -34,9 +33,9 @@ try:
     from utils.preprocessing import clean_text
     import plotly.graph_objects as go
     from utils.visualization import (
-        create_text_length_histogram, 
-        create_word_count_histogram, 
-        create_sentiment_distribution, 
+        create_text_length_histogram,
+        create_word_count_histogram,
+        create_sentiment_distribution,
         create_word_frequency_chart,
         create_wordcloud
     )
@@ -138,14 +137,14 @@ def create_sample_data():
         "Average service, wouldn't go out of my way to recommend it.",
         "Best purchase I've made this year, incredible value!"
     ]
-    
+
     sample_sentiments = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1]  # 1 pour positif, 0 pour négatif
-    
+
     df = pd.DataFrame({
         'target': sample_sentiments,
         'text': sample_texts
     })
-    
+
     return df
 
 # Fonction pour charger le modèle et le tokenizer
@@ -159,7 +158,7 @@ def load_model_and_tokenizer(model_path=None, tokenizer_name="roberta-base", dev
     credential = DefaultAzureCredential()
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+
     # Vérifier si le modèle existe localement
     if model_path and os.path.exists(model_path):
         # Charger directement depuis le fichier local
@@ -171,12 +170,12 @@ def load_model_and_tokenizer(model_path=None, tokenizer_name="roberta-base", dev
             temp_model_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pt')
             temp_model_file.close()
             model_file_path = temp_model_file.name
-            
+
             # Connection string ou SAS URL
             connection_string = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
             # Ou utiliser une URL SAS si la chaîne de connexion n'est pas disponible
             sas_url = os.environ.get("MODEL_SAS_URL")
-            
+
             if connection_string:
                 # Télécharger avec une chaîne de connexion
                 blob = BlobClient.from_connection_string(
@@ -196,27 +195,27 @@ def load_model_and_tokenizer(model_path=None, tokenizer_name="roberta-base", dev
             else:
                 print("Aucune information d'authentification Azure Storage trouvée")
                 return None, None
-                
+
             print(f"Modèle téléchargé depuis Azure Blob Storage vers {model_file_path}")
         except Exception as e:
             print(f"Erreur lors du téléchargement du modèle: {str(e)}")
             return None, None
-    
+
     # Charger le tokenizer
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-    
+
     # Initialiser le modèle
     model = TRABSA_PyTorch(transformer_model=tokenizer_name)
-    
+
     # Charger les poids du modèle
     model.load_state_dict(torch.load(model_file_path, map_location=device))
     model.to(device)
     model.eval()
-    
+
     # Supprimer le fichier temporaire si nécessaire
     if model_path != model_file_path and os.path.exists(model_file_path):
         os.unlink(model_file_path)
-    
+
     return model, tokenizer
 
 # Titre principal de l'application
@@ -241,48 +240,48 @@ if page == "Analyse Exploratoire":
     st.markdown("""
     Cette section présente une analyse statistique et visuelle du jeu de données utilisé pour l'entraînement du modèle TRABSA.
     """)
-    
+
     # Afficher quelques statistiques générales
     st.subheader("Aperçu des données")
     st.dataframe(data.head())
-    
+
     st.markdown(f"**Nombre total d'échantillons:** {len(data)}")
-    
+
     # Distribution des sentiments
     st.subheader("Distribution des sentiments")
     sentiment_fig = create_sentiment_distribution(data)
     st.plotly_chart(sentiment_fig, use_container_width=True)
-    
+
     # Créer deux colonnes pour les graphiques
     col1, col2 = st.columns(2)
-    
+
     with col1:
         # Histogramme de longueur de texte
         st.subheader("Longueur des textes")
         length_fig = create_text_length_histogram(data)
         st.plotly_chart(length_fig, use_container_width=True)
-    
+
     with col2:
         # Histogramme du nombre de mots
         st.subheader("Nombre de mots par texte")
         word_count_fig = create_word_count_histogram(data)
         st.plotly_chart(word_count_fig, use_container_width=True)
-    
+
     # Mots fréquents
     st.subheader("Mots les plus fréquents")
     word_freq_fig = create_word_frequency_chart(data)
     st.plotly_chart(word_freq_fig, use_container_width=True)
-    
+
     # WordCloud
     st.subheader("Nuage de mots")
     wordcloud_fig = create_wordcloud(data)
     st.pyplot(wordcloud_fig)
-    
+
     # Ajouter une description pour les malvoyants
     st.markdown("""
-    **Description du nuage de mots (pour les lecteurs d'écran)**: 
-    Le nuage de mots montre visuellement les mots les plus fréquents, où la taille du mot est proportionnelle 
-    à sa fréquence dans le corpus. Pour une analyse détaillée des fréquences exactes, veuillez consulter 
+    **Description du nuage de mots (pour les lecteurs d'écran)**:
+    Le nuage de mots montre visuellement les mots les plus fréquents, où la taille du mot est proportionnelle
+    à sa fréquence dans le corpus. Pour une analyse détaillée des fréquences exactes, veuillez consulter
     le graphique "Mots les plus fréquents" ci-dessus.
     """)
 
@@ -291,13 +290,13 @@ elif page == "Prédiction de Sentiment":
     st.header("Prédiction de Sentiment avec TRABSA")
     st.markdown("""
     Entrez un texte ci-dessous pour analyser son sentiment à l'aide du modèle TRABSA (Transformer-BiLSTM).
-    
+
     Le modèle va prédire si le sentiment est positif ou négatif, avec un score de confiance.
     """)
-    
+
     # Chargement du modèle
     model, tokenizer = load_model_and_tokenizer()
-    
+
     if model is not None and tokenizer is not None:
         # Zone de saisie de texte
         user_input = st.text_area(
@@ -306,30 +305,30 @@ elif page == "Prédiction de Sentiment":
             height=150,
             help="Entrez un texte en anglais pour analyser son sentiment"
         )
-        
+
         # Bouton pour lancer la prédiction
         if st.button("Analyser le sentiment", key="predict_button"):
             # Afficher un spinner pendant le chargement
             with st.spinner("Analyse en cours..."):
                 # Prédire le sentiment
                 sentiment, probability = predict_sentiment(user_input, model, tokenizer)
-                
+
                 # Afficher les résultats avec des couleurs accessibles
                 st.subheader("Résultat de l'analyse")
-                
+
                 # Créer deux colonnes pour l'affichage des résultats
                 res_col1, res_col2 = st.columns(2)
-                
+
                 with res_col1:
                     # Afficher le sentiment
                     sentiment_color = "#009E73" if sentiment == "positif" else "#D55E00"  # Vert ou orange accessible
-                    
+
                     st.markdown(f"""
                     <div style="
-                        background-color: {sentiment_color}; 
-                        color: white; 
-                        padding: 20px; 
-                        border-radius: 10px; 
+                        background-color: {sentiment_color};
+                        color: white;
+                        padding: 20px;
+                        border-radius: 10px;
                         text-align: center;
                         font-size: 24px;
                         font-weight: bold;
@@ -337,7 +336,7 @@ elif page == "Prédiction de Sentiment":
                         Sentiment: {sentiment.upper()}
                     </div>
                     """, unsafe_allow_html=True)
-                
+
                 with res_col2:
                     # Afficher la probabilité
                     fig = go.Figure(go.Indicator(
@@ -356,21 +355,21 @@ elif page == "Prédiction de Sentiment":
                             ],
                         }
                     ))
-                    
+
                     fig.update_layout(
                         height=300,
                         font={'size': 16, 'color': "#0A0A0A"}
                     )
-                    
+
                     st.plotly_chart(fig, use_container_width=True)
-                
+
                 # Ajouter une explication textuelle pour les personnes malvoyantes
                 st.markdown(f"""
-                **Explication (pour les lecteurs d'écran)**: 
-                Le texte "{user_input}" a été analysé comme ayant un sentiment **{sentiment}** 
+                **Explication (pour les lecteurs d'écran)**:
+                Le texte "{user_input}" a été analysé comme ayant un sentiment **{sentiment}**
                 avec une confiance de **{probability*100:.1f}%**.
                 """)
-                
+
                 # Ajouter des détails techniques
                 with st.expander("Détails techniques"):
                     st.markdown(f"""
@@ -379,12 +378,12 @@ elif page == "Prédiction de Sentiment":
                     - **Seuil de décision**: 0.5 (>0.5 est positif, ≤0.5 est négatif)
                     - **Texte nettoyé**: {' '.join(clean_text(user_input))}
                     """)
-        
+
         # Ajouter quelques exemples pour faciliter les tests
         with st.expander("Exemples de textes à tester"):
             st.markdown("""
             Cliquez sur un exemple pour l'utiliser:
-            
+
             - "I absolutely love this product! It exceeded all my expectations."
             - "This was a terrible experience, the customer service was awful."
             - "The product is okay, nothing special but it works as expected."
@@ -406,7 +405,7 @@ Ce dashboard a été conçu en suivant les critères d'accessibilité WCAG:
 # Afficher la version et les informations
 st.sidebar.markdown("---")
 st.sidebar.info("""
-**TRABSA Dashboard** v1.0  
+**TRABSA Dashboard** v1.0
 © 2025 - Tous droits réservés
 """)
 
