@@ -108,7 +108,7 @@ def load_data():
     if os.path.exists("Dataset_Init.csv"):
         try:
             # Tenter de lire le fichier avec l'encodage détecté
-            df = pd.read_csv("Dataset_Init.csv", header=None, encoding='Windows-1252')
+            df = pd.read_csv("Dataset_Init.csv", encoding='Windows-1252')
             # Définir les titres des colonnes
             df.columns = ["target", "ids", "date", "flag", "user", "text"]
             # Convertir la colonne 'target' en type int
