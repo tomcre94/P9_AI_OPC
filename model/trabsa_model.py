@@ -19,6 +19,7 @@ class TRABSA_PyTorch(nn.Module):
 
         # Classifier layer: input size will be 2 * lstm_hidden_size (due to bidirectional)
         self.classifier = nn.Linear(lstm_hidden_size * 2, 1)
+        self.sigmoid = nn.Sigmoid() # Add sigmoid activation
 
     def forward(self, input_ids, attention_mask):
         outputs = self.transformer(input_ids=input_ids, attention_mask=attention_mask)
@@ -33,4 +34,4 @@ class TRABSA_PyTorch(nn.Module):
         pooled_output = lstm_output[:, 0, :]
 
         logits = self.classifier(pooled_output)
-        return logits
+        return self.sigmoid(logits) # Apply sigmoid to the output
